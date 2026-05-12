@@ -95,7 +95,7 @@ def train():
     BATCH_SIZE = 4
     ACCUMULATION_STEPS = 4  # Accumulate gradients 4 lần → Batch ảo 16
     EPOCHS = 30
-    RESUME_EPOCH = 0  # Tiếp tục từ epoch 20 nếu có checkpoint
+    RESUME_EPOCH = 11  # Tiếp tục từ epoch 20 nếu có checkpoint
     LEARNING_RATE = 1e-4
 
     # Chọn thiết bị (GPU nếu có, không thì CPU)
