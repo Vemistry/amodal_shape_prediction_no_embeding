@@ -161,15 +161,14 @@ def train():
             desc=f"Epoch {epoch+1}/{EPOCHS}"
         )
 
-        for i, (inputs, targets, occluded, class_ids) in progress_bar:
+        for i, (inputs, targets, occluded, _) in progress_bar: # Bỏ qua class_ids
             # Di chuyển dữ liệu lên GPU
             inputs = inputs.to(DEVICE)
             targets = targets.unsqueeze(1).float().to(DEVICE)  # Thêm chiều kênh
             occluded = occluded.unsqueeze(1).float().to(DEVICE)
-            class_ids = class_ids.to(DEVICE)
 
             # Forward pass: tính dự đoán
-            outputs = model(inputs, class_ids) 
+            outputs = model(inputs)
             loss = criterion(outputs, targets, occluded)
             
             # Gradient accumulation: chia loss cho số bước tích lũy

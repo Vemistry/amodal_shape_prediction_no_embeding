@@ -28,7 +28,7 @@ import numpy as np
 from ultralytics import SAM
 import gc
 
-from src.model import AmodalSwinUNet
+from scripts.model import AmodalSwinUNet
 
 
 # ===================================================================================
@@ -327,12 +327,17 @@ def end_to_end_predict(orig_image, pts, category_id):
         result_img = img_resized.copy()
         amodal_overlay = result_img.copy()
 
-        # Xác định vùng bị che khuất
-        invisible_part = np.clip(pred_mask - visible_mask, 0, 1)
+        # Xác định vùng bị che khuất một cách rõ ràng bằng toán tử boolean
+        # Chuyển các mask về dạng boolean (True/False)
+        visible_bool = (visible_mask > 0.5)
+        pred_bool = (pred_mask > 0)
+        
+        # Phần bị che khuất = (có trong dự đoán) VÀ (KHÔNG có trong phần nhìn thấy)
+        invisible_bool = pred_bool & ~visible_bool
 
         # Tô màu trên CÙNG MỘT layer ảo
-        amodal_overlay[visible_mask == 1] = [0, 255, 0]       # Phần nhìn thấy = Xanh lá (giống hệt SAM)
-        amodal_overlay[invisible_part == 1] = [255, 255, 0]   # Phần bị lấp = Vàng
+        amodal_overlay[visible_bool] = [0, 255, 0]       # Phần nhìn thấy = Xanh lá (giống hệt SAM)
+        amodal_overlay[invisible_bool] = [255, 255, 0]   # Phần bị lấp = Vàng
 
         # Trộn layer ảo (chứa cả xanh và vàng) với ảnh gốc
         cv2.addWeighted(amodal_overlay, 0.4, result_img, 0.6, 0, result_img)
@@ -340,9 +345,9 @@ def end_to_end_predict(orig_image, pts, category_id):
         # ──────────────────────────────────────────────────────────────
         # TÍNH THỐNG KÊ
         # ──────────────────────────────────────────────────────────────
-        area_sam = int(np.sum(visible_mask))
+        area_sam = int(np.sum(visible_bool))
         area_swin = int(np.sum(pred_mask))
-        area_invisible = int(np.sum(invisible_part))
+        area_invisible = int(np.sum(invisible_bool))
 
         # Xác định xem có occlusion không
         THRESHOLD = 200  # Ngưỡng số pixel để xác định occlusion

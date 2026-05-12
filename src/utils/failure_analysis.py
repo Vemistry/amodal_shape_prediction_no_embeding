@@ -11,7 +11,7 @@ Sử dụng:
 
 import json, argparse, os, numpy as np, cv2, matplotlib.pyplot as plt, torch, albumentations as A
 from tqdm import tqdm
-from model import AmodalSwinUNet
+from scripts.model import AmodalSwinUNet
 from dataset import AmodalDataset
 
 
